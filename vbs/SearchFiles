@@ -1,0 +1,45 @@
+Option Explicit
+
+Dim fso, folder, file, subFolder
+
+Set fso = WScript.CreateObject("Scripting.FileSystemObject")
+Set folder = fso.GetFolder("path/to/folder")
+filelist(folder)
+
+Const lns = "--------------------"
+
+Sub filelist(folder)
+  Dim arrHeaders(35)
+  Dim objShell
+  Dim objFolder
+  Dim i
+
+  Dim strFileName
+
+  WScript.StdOut.WriteLine lns & vbCrLf & folder.Name & vbCrLf & lns
+
+  ' プロパティ取得用オブジェクト
+  Set objShell = CreateObject("Shell.Application")
+  Set objFolder = objShell.Namespace(folder.path)
+
+
+  For i = 0 to 34
+    arrHeaders(i) = objFolder.GetDetailsOf(objFolder.Items, i)
+  Next
+
+  For Each strFileName in objFolder.Items
+    WScript.StdOut.WriteLine strFileName
+
+    For i = 0 to 34
+      WScript.StdOut.WriteLine i & vbtab & arrHeaders(i) & ": " & objFolder.GetDetailsOf(strFileName, i)
+    Next
+
+    WScript.StdOut.WriteLine
+  Next
+
+
+  For Each subFolder In folder.SubFolders
+    filelist(subFolder)
+  Next
+
+End Sub
